@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+	
+	<html lang="en">
+
+
+		<head>
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+			<title>Knockout Js App</title>
+			<link rel="stylesheet" href='./css/bootstrap.css'/>
+			
+			<script type='text/javascript' src='knockout-3.5.0.js'></script>
+			<script type="text/javascript" src="./jquery.js"></script>
+			
+			<script type="text/javascript">
+			
+				$(document).ready(function(){
+					function DefaultItem() {
+						this.itemName= ko.observable('');
+						this.itemCost= ko.observable('');
+						this.placeholderName= 'Enter Name';
+						this.placeholderCost= 'Enter Cost';
+					}
+					
+					function ItemModel(itemName, itemCost){
+						var self= this;
+						this.itemName= ko.observable(itemName);
+						this.itemCost= ko.observable(itemCost);
+						this.qty= ko.observable(1);
+						this.total= ko.computed(function() { return self.qty() ? (self.qty() * self.itemCost()): 0});
+					}
+
+					items= {
+						type: "Stationary",
+						vmItemArr: ko.observableArray([
+							/*new ItemModel("Pen", 7.50),
+							new ItemModel("Book", 17.50),
+							new ItemModel("Notes", 20.25),
+							new ItemModel("Bottle", 15.00),
+							new ItemModel("Bag", 70.00),
+							new ItemModel("Shoes", 200.00)*/])
+					}
+					//items.cnt= ko.computed((()=> this.vmItemArr().length).bind(items));
+
+
+					var defaultItem = new DefaultItem();
+					//var vmItem = new ViewModelItem("Pencils", 5.5);
+					//ko.applyBindings(defaultItem, $("#addItemDiv")[0]);
+					//ko.applyBindings(items, $("#itemsDiv")[0]);
+					function ParentModel() {
+						var self= this;
+						self.defaultItem= defaultItem;
+						self.items= ko.observable(items);
+					
+						self.addItem= function(){
+							self.items().vmItemArr.push(new ItemModel(self.defaultItem.itemName(), self.defaultItem.itemCost()));
+							self.defaultItem.itemName('');
+							self.defaultItem.itemCost('');
+						};
+						
+						self.deleteItem= function(index){					
+							self.items().vmItemArr.splice(index,1);
+						};
+					}
+					var parentModel= new ParentModel();
+					ko.applyBindings(parentModel);
+				});
+			console.log('sdasd');
+			</script>
+		</head>
+		
+		<body>
+			<div class="container" id="addItemDiv">
+				<div class="card mt-2">
+					<div class="mr-2 ml-2 mb-2">
+					<h3>Enter New Item Details:</h3>
+					<div class="form-group mr-2 ml-2">
+						<label for="itemNameId">Item Name: </label>
+						<input type="text" class="form-control" id="itemNameId"
+							data-bind="value:defaultItem.itemName, attr: {placeholder: defaultItem.placeholderName}"/>
+					</div>
+					<div class="form-group mr-2 ml-2">	
+						<label for="itemCostId">Item Cost: </label>
+						<input type="text" class="form-control" id="itemCostId"
+							data-bind="value:defaultItem.itemCost, attr: {placeholder: defaultItem.placeholderCost}"/>
+					
+						<!--<div>Data:<p data-bind="text: $data"/></div> -->
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-6 col-sm-6">
+							<button class="btn btn-info" data-bind="click: addItem">Add Item</button>
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+			<br>
+			<div class="container" id="itemsDiv" data-bind="if: items().vmItemArr().length">
+				<div data-bind="foreach: items().vmItemArr()">
+					<div class="card">
+						<div class="ml-2 mr-2">
+							<div class="card-header">
+								<div class="float-right mt-2">
+									<button class="btn btn-danger" 
+										data-bind="click: $root.deleteItem.bind($data,$index()), attr: {'data-index':$index()}">Delete</button>
+								</div>
+								
+								<div class="form-group">
+									<div class="form-group">
+										<label class="control-label" data-bind="text: itemName"/>
+									</div>
+									<div class="form-group">
+										<label class="control-label" data-bind="text: '$'+itemCost()"/>
+									</div>
+								</div>
+							</div>
+							<div class="card-body">							
+								<div class="form-inline">
+									<div class="form-group col-6">
+										<label class="control-label">Item Count: </label>
+										<!--<div class="">-->
+											<input type="text" class="form-control" data-bind="value: qty, attr: { 'item-cost': itemCost }" placeholder="How many ?"/>
+										<!--</div>-->
+									</div>
+									<div class="form-group col-6">
+										<label class="control-label">Total: $</label><!--ko text: total--><!--/ko--></span>
+										
+									</div>
+								</div>
+							</div>
+							<div class="card-footer">
+								<label class="col-12">*Terms and Conditions apply</label>
+							</div>
+						</div>
+					</div>
+					<br>
+				</div>
+			</div>
+		</body>
+	</html>

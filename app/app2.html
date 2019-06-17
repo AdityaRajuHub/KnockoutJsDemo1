@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	
+	<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+
+		<head>
+		
+			<title>Knockout Js App</title>
+			
+			<script type='text/javascript' src='knockout-3.5.0.js'></script>
+			<script type="text/javascript" src="./jquery.js"></script>
+			
+			<script type="text/javascript">
+			$(document).ready(function(){
+			function DefaultItem() {
+				this.itemName= ko.observable('');
+				this.itemCost= ko.observable('');
+				this.placeholderName= 'Enter Name';
+				this.placeholderCost= 'Enter Cost';
+			}
+			
+			function ItemModel(itemName, itemCost){
+				var self= this;
+				this.itemName= ko.observable(itemName);
+				this.itemCost= ko.observable(itemCost);
+				this.qty= ko.observable(1);
+				this.total= ko.computed(function() { return self.qty() ? (self.qty() * self.itemCost()): 0});
+			}
+
+			items= {
+				type: "Stationary",
+				vmItemArr: ko.observableArray([
+					/*new ItemModel("Pen", 7.50),
+					new ItemModel("Book", 17.50),
+					new ItemModel("Notes", 20.25),
+					new ItemModel("Bottle", 15.00),
+					new ItemModel("Bag", 70.00),
+					new ItemModel("Shoes", 200.00)*/])
+			}
+			//items.cnt= ko.computed((()=> this.vmItemArr().length).bind(items));
+
+
+			var defaultItem = new DefaultItem();
+			//var vmItem = new ViewModelItem("Pencils", 5.5);
+			//ko.applyBindings(defaultItem, $("#addItemDiv")[0]);
+			//ko.applyBindings(items, $("#itemsDiv")[0]);
+			function ParentModel() {
+				var self= this;
+				self.defaultItem= defaultItem;
+				self.items= ko.observable(items);
+			
+				self.addItem= function(){
+					self.items().vmItemArr.push(new ItemModel(self.defaultItem.itemName(), self.defaultItem.itemCost()));
+					self.defaultItem.itemName('');
+					self.defaultItem.itemCost('');
+				};
+				
+				self.deleteItem= function(index){					
+					self.items().vmItemArr.splice(index,1);
+				};
+			}
+			var parentModel= new ParentModel();
+			ko.applyBindings(parentModel);
+
+			});
+			</script>
+		</head>
+		
+		<body>
+			<div id="addItemDiv">
+				<h1>Welcome to Knockout JS </h1>
+				<h2>Enter New Item Details:</h2>
+				<p>Item Name: <input type="text" data-bind="value:defaultItem.itemName, attr: {placeholder: defaultItem.placeholderName}"/></p>
+				<p>Item Cost: <input type="text" data-bind="value:defaultItem.itemCost, attr: {placeholder: defaultItem.placeholderCost}"/></p>
+				<!--<div>Data:<p data-bind="text: $data"/></div> -->
+				<p><button data-bind="click: addItem">Add Item</button></p>
+			</div>
+			<hr>
+			<div id="itemsDiv" data-bind="if: items().vmItemArr().length">
+				<div data-bind="foreach: items().vmItemArr()">
+					<p>Item #: <span data-bind="text: ($index()+1)"/></span>
+					
+					<span style="float:right;"><button data-bind="click: $root.deleteItem.bind($data,$index()), attr: {'data-index':$index()}">Delete</button></span></p>
+					<p>Item Name : <b><label data-bind="text: itemName"/></b></p>
+					
+					<p>Item Count: <input type="text" data-bind="value: qty, attr: { 'item-cost': itemCost }"/></p>
+					<p>Total: <b><span data-bind="text: total"></span></b></p>
+					<hr>
+				</div>
+				
+			</div>
+		</body>
+	</html>

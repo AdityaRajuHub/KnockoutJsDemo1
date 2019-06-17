@@ -1,0 +1,59 @@
+
+<html>
+
+	<head>
+	
+		<title>Knockout Js App</title>
+		
+		<script type='text/javascript' src='knockout-3.5.0.js'></script>
+		<script type="text/javascript" src="./jquery.js"/>
+		
+		<script>
+		
+			//var ko= require('../node_modules/knockout/build/output/knockout-latest.debug.js');
+			
+			function ViewModelHeader(fName, lName){
+				this.firstName= ko.observable(fName);
+				this.lastName= ko.observable(lName);
+				
+				this.fullName= ko.computed(() => this.lastName() + ", " + this.firstName());
+			}
+			/*function ViewModelItem(itemName, itemCost){
+				this.itemName= ko.observable(itemName);
+				this.itemCost= ko.observable(itemCost);
+				this.qty= ko.observable(0);
+				this.total= ko.computed((function() { return this.qty() ? (this.qty() * this.itemCost()): 0}).bind(this));
+			}*/
+
+			var vmItem= {
+				"itemName": ko.observable('Pencils'),
+				"qty": ko.observable(0),
+				"itemCost": ko.observable(5)
+			};
+
+			vmItem.total= ko.computed((function() { return this.qty() ? (this.qty() * this.itemCost()): 0}).bind(vmItem));
+
+
+			var vm = new ViewModelHeader("Aditya", "Raju");
+			//var vmItem = new ViewModelItem("Pencils", 5.5);
+			ko.applyBindings(vm, $("#header")[0]);
+			ko.applyBindings(vmItem, $("#content")[0]);
+			
+		</script>
+	</head>
+	
+	<body>
+		<div id="header">
+			<h1>Welcome to our Knockout JS </h1>
+			<h2 data-bind="text: vm.fullName"></h2>
+			<p>First Name: <input type="text" data-bind="value: vm.firstName"/></p>
+			<p>Last Name: <input type="text" data-bind="value: vm.lastName"/></p>
+			<div>Data:<p data-bind="text: $data"/></div> 
+		</div>
+		<div id="content">
+			<p>Item Name : <b><label data-bind="text: itemName"/></b></p>
+			<p>Item Count: <input type="text" data-bind="value: qty, attr: { 'item-cost': vmItem.itemCost }"/></p>
+			Total: <p data-bind="text: total"></p>
+		</div>
+	</body>
+<html>
